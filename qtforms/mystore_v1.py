@@ -2,6 +2,10 @@ from PyQt5.QtWidgets import QApplication, QWidget, QRadioButton, QPushButton, QL
     QDateEdit
 import sys
 
+data = []
+data_sort = []
+data_basket = []
+
 
 class Login(QWidget):
     def __init__(self):
@@ -59,12 +63,11 @@ class Login(QWidget):
 
 
 class ProductCreator(QWidget):
-    def __init__(self):
+    def __init__(self, data):
         super().__init__()
         self.initUI()
-        self.data = []
-        self.creator_data = [self.back, self.name, self.inf, self.crldate, self.cdate, self.cteg, self.crprice,
-                             self.createdn]
+        self.data = data
+        self.creator_data = [self.back, self.name, self.inf, self.cteg, self.crprice, self.createdn]
 
     def initUI(self):
         self.setWindowTitle('Создание нового товара')
@@ -82,29 +85,18 @@ class ProductCreator(QWidget):
         self.inf.resize(300, 400)
         self.inf.move(150, 200)
 
-        self.crldate = QLabel('Дата изготовления:', self)  # надпись "Дата изготовления"
-        self.crldate.adjustSize()
-        self.crldate.move(550, 300)
-
-        self.cdate = QDateEdit(self)
-        self.cdate.adjustSize()
-        self.cdate.move(700, 300)
-
         self.cteg = QTextEdit('Теги', self)
         self.cteg.resize(200, 80)
-        self.cteg.move(550, 350)
+        self.cteg.move(550, 300)
 
         self.crprice = QTextEdit('Цена', self)
         self.crprice.resize(200, 40)
-        self.crprice.move(550, 450)
+        self.crprice.move(550, 400)
 
         self.createdn = QPushButton('Создать', self)
         self.createdn.resize(200, 40)
         self.createdn.move(800, 650)
         self.createdn.clicked.connect(self.product_creator)
-
-    def return_data(self):
-        return self.data
 
     def set_creator(self, creator):
         self.creator = creator
@@ -121,13 +113,16 @@ class ProductCreator(QWidget):
     def product_creator(self):
         self.data.append([self.name.toPlainText(), self.inf.toPlainText(), self.cteg.toPlainText(),
                           self.crprice.toPlainText()])
-        # for elem in self.return_data():
+        # for elem in self.data:
         #     print(f'название - {elem[0]};\nинформация - {elem[1]};\nтеги - {elem[2]};\nцена - {elem[3]}\n\n')
 
 
 class Catalog(QWidget):
-    def __init__(self):
+    def __init__(self, data, data_basket):
         super().__init__()
+        self.data = data
+        self.data_basket = data_basket
+        self.sorter = []
         self.initUI()
         self.catalog_data = [self.back, self.lsearch, self.search, self.categ, self.food, self.technique]
 # self.label, self.namprod, self.description, self.teg, self.ldate, self.date, self.price, self.basket, self.num,
@@ -152,7 +147,7 @@ class Catalog(QWidget):
         self.bsearch = QPushButton('Искать', self)
         self.bsearch.resize(150, 46)
         self.bsearch.move(335, 30)
-        self.bsearch.clicked.connect(self.search_clict)
+        self.bsearch.clicked.connect(self.sort_data)
 
         self.cartbutton = QPushButton('Перейти в корзину', self)
         self.cartbutton.resize(250, 46)
@@ -166,11 +161,38 @@ class Catalog(QWidget):
         self.food = QCheckBox('Пищевые продукты', self)
         self.food.resize(238, 36)
         self.food.move(820, 60)
-        # self.food.clicked.connect(self.categories_food)
+        self.food.clicked.connect(self.categories_food)
 
         self.technique = QCheckBox('Бытовая техника', self)
         self.technique.resize(212, 36)
         self.technique.move(820, 100)
+        self.food.clicked.connect(self.categories_technique)
+
+    def sort_data(self):
+        data_sort = []
+        self.categories_technique()
+        self.categories_technique()
+        print(self.sorter)
+        for elem in self.data:
+            if elem[0] in self.sorter or elem[2] in self.sorter:
+                data_sort.append(elem)
+
+    def categories_food(self):
+        if self.food.isChecked() and 'пищевые продукты' not in self.sorter:
+            self.sorter.append('пищевые продукты')
+        elif self.food.isChecked() and 'пищевые продукты' in self.sorter:
+            self.sorter.remove('пищевые продукты')
+        print(self.sorter)
+
+    def categories_technique(self):
+        if self.technique.isChecked() and 'бытовая техника' not in self.sorter:
+            self.sorter.append('бытовая техника')
+        elif self.technique.isChecked() and 'бытовая техника' in self.sorter:
+            self.sorter.remove('бытовая техника')
+
+    def search_clict(self):  # Искать товары по критериям
+        self.sorter.append(self.search.toPlainText())
+        self.search.clear()
 
     def set_login(self, login):
         self.login = login
@@ -187,9 +209,6 @@ class Catalog(QWidget):
         rect = self.geometry()
         self.login.setGeometry(rect)
 
-    def search_clict(self):
-        print(self.
-
     def go_to_cart(self):
         self.basket.show()
         self.hide()
@@ -198,8 +217,7 @@ class Catalog(QWidget):
 
 
 class Basket(QWidget):
-
-    def __init__(self):
+    def __init__(self, data_basket):
         super().__init__()
         self.data = []
         self.initUI()
@@ -242,9 +260,9 @@ class Basket(QWidget):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     login = Login()
-    creator = ProductCreator()
-    catalog = Catalog()
-    basket = Basket()
+    creator = ProductCreator(data)
+    catalog = Catalog(data, data_basket)
+    basket = Basket(data_basket)
 
     login.set_creator(creator)
     login.set_catalog(catalog)

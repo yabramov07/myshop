@@ -123,6 +123,7 @@ class Catalog(QWidget):
         self.data = data
         self.data_basket = data_basket
         self.sorter = []
+        self.filter = []
         self.initUI()
         self.catalog_data = [self.back, self.lsearch, self.search, self.categ, self.food, self.technique]
 # self.label, self.namprod, self.description, self.teg, self.ldate, self.date, self.price, self.basket, self.num,
@@ -147,7 +148,7 @@ class Catalog(QWidget):
         self.bsearch = QPushButton('Искать', self)
         self.bsearch.resize(150, 46)
         self.bsearch.move(335, 30)
-        self.bsearch.clicked.connect(self.sort_data)
+        # self.bsearch.clicked.connect(self.sort_data)
 
         self.cartbutton = QPushButton('Перейти в корзину', self)
         self.cartbutton.resize(250, 46)
@@ -161,38 +162,71 @@ class Catalog(QWidget):
         self.food = QCheckBox('Пищевые продукты', self)
         self.food.resize(238, 36)
         self.food.move(820, 60)
-        self.food.clicked.connect(self.categories_food)
+        # self.food.clicked.connect(self.categories_food)
 
         self.technique = QCheckBox('Бытовая техника', self)
         self.technique.resize(212, 36)
         self.technique.move(820, 100)
-        self.food.clicked.connect(self.categories_technique)
+        # self.technique.clicked.connect(self.categories_technique)
 
-    def sort_data(self):
-        data_sort = []
-        self.categories_technique()
-        self.categories_technique()
-        print(self.sorter)
-        for elem in self.data:
-            if elem[0] in self.sorter or elem[2] in self.sorter:
-                data_sort.append(elem)
-
-    def categories_food(self):
-        if self.food.isChecked() and 'пищевые продукты' not in self.sorter:
-            self.sorter.append('пищевые продукты')
-        elif self.food.isChecked() and 'пищевые продукты' in self.sorter:
-            self.sorter.remove('пищевые продукты')
-        print(self.sorter)
-
-    def categories_technique(self):
-        if self.technique.isChecked() and 'бытовая техника' not in self.sorter:
-            self.sorter.append('бытовая техника')
-        elif self.technique.isChecked() and 'бытовая техника' in self.sorter:
-            self.sorter.remove('бытовая техника')
+    # def categories_food(self):
+    #     if self.food.isChecked() and 'пищевые продукты' not in self.sorter:
+    #         self.sorter.append('пищевые продукты')
+    #     elif self.food.isChecked() and 'пищевые продукты' in self.sorter:
+    #         self.sorter.remove('пищевые продукты')
+    #     print(self.sorter)
+    #
+    # def categories_technique(self):
+    #     if self.technique.isChecked() and 'бытовая техника' not in self.sorter:
+    #         self.sorter.append('бытовая техника')
+    #     elif self.technique.isChecked() and 'бытовая техника' in self.sorter:
+    #         self.sorter.remove('бытовая техника')
 
     def search_clict(self):  # Искать товары по критериям
         self.sorter.append(self.search.toPlainText())
         self.search.clear()
+        for elem in self.data:
+            # if elem[0] in self.sorter or elem[2] in self.sorter:
+            is_food = True
+            if self.food.isChecked():
+                if "пищевые продукты" not in elem[2]:
+                    is_food = False
+
+            is_technique = True
+            if self.food.isChecked():
+                if 'бытовая техника' not in elem[2]:
+                    is_technique = False
+
+            is_search = True
+            if self.search.toPlainText():
+                if self.search.toPlainText() not in elem[0] and elem[2] not in self.search.toPlainText():
+                    is_search = False
+            if is_search and is_food and is_technique:
+                self.filter.append(elem)
+
+        self.show_catalog()
+
+    def show_catalog(self):
+        for i, elem in enumerate(self.filter):
+            self.name[i] = QLabel(elem[0], self)
+            self.name[i].resize(250, 40)
+            self.name[i].move(60, 150)
+
+            self.tag[i] = QLabel(elem[2], self)
+            self.tage[i].resize(300, 40)
+            self.tag[i].move(320, 150)
+
+            self.description[i] = QLabel(elem[1], self)
+            self.description[i].resize(520, 70)
+            self.description[i].move(60, 180)
+
+            self.price[i] = QLabel(elem[3], self)
+            self.price[i].resize(80, 30)
+            self.price[i].move(600, 180)
+
+            self.to_cart[i] = QPushButton('В корзину', self)
+            self.to_cart[i].resize(80, 30)
+            self.to_cart[i].move(600, 220)
 
     def set_login(self, login):
         self.login = login

@@ -15,10 +15,15 @@ def to_decimal(number, base):
     print(summ)
 
 
-question = input('из десятичной / в десятичную: ')
-if question == 'из десятичной':
-    number, base = int(input('Изначальное число: ')), int(input('Основание нового числа: '))
-    from_decimal(number, base)
-elif question == 'в десятичную':
-    number, base = int(input('Изначальное число: ')), int(input('Основание изначального числа: '))
-    to_decimal(number, base)
+while True:
+    question = input('из десятичной (1) / в десятичную (2): ')
+    if question == 'stop':
+        break
+    if question == 'из десятичной' or question == '1':
+        number, base = int(input('Изначальное число: ')), int(input('Основание нового числа: '))
+        from_decimal(number, base)
+        print('-' * 52)
+    elif question == 'в десятичную' or question == '2':
+        number, base = int(input('Изначальное число: ')), int(input('Основание изначального числа: '))
+        to_decimal(number, base)
+        print('-' * 52)
